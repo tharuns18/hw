@@ -120,7 +120,7 @@ def shard_slice(n: int, rank: int, world: int):
 ###important: your ring_allreduce_ is called here###
 ###we do the all-reduce warpper for you### 
 def allreduce_grads_ring_(model: nn.Module, world_size=None, rankid=None, opt=None):
-    from hw1.q3 import ring_allreduce_
+    from q3 import ring_allreduce_
     grads = [p.grad for p in model.parameters() if p.grad is not None]
     if not grads: return
     flat = _flatten_dense_tensors(grads)
@@ -134,7 +134,7 @@ def allreduce_grads_ring_(model: nn.Module, world_size=None, rankid=None, opt=No
 def run_training(args):
     from transformers import AutoModelForCausalLM, AutoTokenizer
     if args.question == 2:
-        from hw1.q2 import PS_grads_
+        from q2 import PS_grads_
 
     print("waiting distributed init setup...")
     ###set up global distributed config###
@@ -150,6 +150,7 @@ def run_training(args):
     tokenizer = AutoTokenizer.from_pretrained(name, trust_remote_code=True)
     tokenizer.pad_token = tokenizer.eos_token
     Qwenmodel = AutoModelForCausalLM.from_pretrained(name, trust_remote_code=True)
+    Qwenmodel = Qwenmodel.float()
 
     ###generate local dataset loader###
     len_max = 256
